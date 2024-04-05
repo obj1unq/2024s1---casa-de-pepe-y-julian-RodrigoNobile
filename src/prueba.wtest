@@ -1,0 +1,41 @@
+import casa.*
+
+test "romper_1000" {
+	casaDePepeYJulian.romper(1000)
+	assert.that(casaDePepeYJulian.hayQueHacerReparaciones())
+	assert.that(casaDePepeYJulian.tieneViveresSuficientes())
+	assert.notThat(casaDePepeYJulian.estaEnOrden())
+}
+
+test "cuenta_vacia" {
+	cuentaConGasto.costoDeOperacion(20)
+	assert.equals(20, cuentaConGasto.costoDeOperacion())
+	cuentaConGasto.depositar(1000)
+	assert.equals(980, cuentaConGasto.saldo())
+}
+
+test "cuenta_combinada" {
+	cuentaCombinada.cambiarCuentaPrimaria(cuentaConGasto)
+	cuentaCombinada.cambiarCuentaSecundaria(cuentaCorriente)
+	cuentaConGasto.costoDeOperacion(50)
+	cuentaCorriente.depositar(500)
+	assert.equals(50, cuentaConGasto.costoDeOperacion())
+	assert.equals(500, cuentaCorriente.saldo())
+	cuentaCombinada.depositar(100)
+	assert.equals(50, cuentaConGasto.saldo())
+	cuentaCombinada.extraer(200)
+	assert.equals(300, cuentaCorriente.saldo())
+	assert.equals(350, cuentaCombinada.saldo())
+}
+
+test "full y minimiIndispensable" {
+	casaDePepeYJulian.romper(100)
+	casaDePepeYJulian.nuevaCuentaParaGastos(cuentaCorriente)
+	casaDePepeYJulian.cuentaParaGastos().depositar(1000)
+	assert.equals(1000, casaDePepeYJulian.saldoDeCasa())
+	casaDePepeYJulian.cambiarEstrategia(full)
+	casaDePepeYJulian.comprarViveres()
+	assert.equals(90, casaDePepeYJulian.viveres())
+	assert.equals(100, casaDePepeYJulian.montoReparaciones())
+	assert.equals(800, casaDePepeYJulian.cuentaParaGastos().saldo())
+}
