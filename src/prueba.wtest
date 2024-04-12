@@ -34,7 +34,7 @@ test "full y minimiIndispensable" {
 	casaDePepeYJulian.cuentaParaGastos().depositar(1000)
 	assert.equals(1000, casaDePepeYJulian.saldoDeCasa())
 	casaDePepeYJulian.cambiarEstrategia(full)
-	casaDePepeYJulian.comprarViveres()
+	casaDePepeYJulian.mantener()
 	assert.equals(90, casaDePepeYJulian.viveres())
 	assert.equals(100, casaDePepeYJulian.montoReparaciones())
 	assert.equals(800, casaDePepeYJulian.cuentaParaGastos().saldo())

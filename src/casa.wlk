@@ -20,12 +20,17 @@ object casaDePepeYJulian {
 		return montoReparaciones
 	}
 	
-	method comprarViveres() {
-		estrategia.comprarViveres()
+	method mantener() {
+		estrategia.mantener(self)
 	}
 	
-	method sumarViveres(porcentaje) {
+	method reparar() {
+		self.pagarGasto(self.montoReparaciones())
+	}
+	
+	method comprarViveres(porcentaje, dinero) {
 		viveres += porcentaje
+		self.pagarGasto(dinero)
 	}
 	
 	method pagarGasto(dinero) {
@@ -134,76 +139,46 @@ object cuentaCombinada {
 }
 
 object minimoIndispensable {
-	var calidad = 1 
-	var porcentaje = 0
-	var casa = casaDePepeYJulian
+	var calidad = 0
 	var property porcentajeSiNoTieneViveresSuficientes = 40
 	
-	method comprarViveres() {
-		self.porcentajeDeCasa()
-		
-		if(not self.tieneViveresSuficientesCasa()) {
-			casa.sumarViveres(porcentajeSiNoTieneViveresSuficientes - porcentaje)
-			casa.pagarGasto((porcentajeSiNoTieneViveresSuficientes  - porcentaje) * calidad)
+	method mantener(casa) {
+		if(not casa.tieneViveresSuficientes()) {
+			casa.comprarViveres(self.porcentajeAComprar(casa), self.porcentajeAComprar(casa) * calidad)
 		}
+	}
+	
+	method porcentajeAComprar(casa) {
+		return porcentajeSiNoTieneViveresSuficientes - casa.viveres()
 	}
 	
 	method cambiarCalidad(_calidad) {
 		calidad = _calidad
 	}
-	
-	method porcentajeDeCasa() {
-		porcentaje = casa.viveres()
-	}
-	
-	method tieneViveresSuficientesCasa() {
-		return casa.tieneViveresSuficientes()
-	}
-	
-	method casaNueva(_casa) {
-		casa = _casa
-	}
 }
 
 object full {
 	const property calidad = 5
-	var porcentaje = 0
-	var casa = casaDePepeYJulian
 	var property porcentajeViveresBase = 40
 	var property porcentajeViveresSiEstaEnOrden = 100 
 	
-	method comprarViveres() {
-		self.porcentajeDeCasa()
-		
-		if(self.estaEnOrdenCasa()) {
-			casa.sumarViveres(porcentajeViveresSiEstaEnOrden - porcentaje)
-			casa.pagarGasto((porcentajeViveresSiEstaEnOrden - porcentaje) * calidad)
-		} else {
-			casa.sumarViveres(porcentajeViveresBase)
-			casa.pagarGasto(porcentajeViveresBase * calidad)
-		}
-		
-		self.pagarReparaciones()
-		
-	}
 	
-	method pagarReparaciones() {
+	method mantener(casa) {
 		const dineroQueSobrara = casa.montoReparaciones() - casa.saldoDeCasa()
 		
+		if(casa.estaEnOrden()) {
+			casa.comprarViveres(self.porcentajeAComprar(casa), 
+				 self.porcentajeAComprar(casa) * calidad)
+		} else {
+			casa.comprarViveres(porcentajeViveresBase, porcentajeViveresBase * calidad)
+		}
+		
 		if(casa.montoReparaciones() < casa.saldoDeCasa() and dineroQueSobrara.abs() > 1000) {
-			casa.pagarGasto(casa.montoReparaciones())
+			casa.reparar()
 		}
 	}
 	
-	method porcentajeDeCasa() {
-		porcentaje = casa.viveres()
-	}
-	
-	method estaEnOrdenCasa() {
-		return casa.estaEnOrden()
-	}
-	
-	method casaNueva(_casa) {
-		casa = _casa
+	method porcentajeAComprar(casa) {
+		return porcentajeViveresSiEstaEnOrden - casa.viveres()
 	}
 }
